@@ -16,7 +16,7 @@ export function loadConfig() {
   const result = dotenv.config({ path: envPath });
   
   if (result.error) {
-    console.warn(`⚠️ Could not load ${envFile}, falling back to process.env`);
+    console.warn(`Could not load ${envFile}, falling back to process.env`);
   }
   
   // Build configuration object from environment variables
@@ -42,7 +42,7 @@ export function loadConfig() {
     }
   };
   
-  console.log(`🔧 Loaded configuration for environment: ${config.environment}`);
+  console.log(`Loaded configuration for environment: ${config.environment}`);
   
   // Validate required configuration
   validateConfig(config);

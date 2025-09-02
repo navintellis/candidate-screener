@@ -31,18 +31,18 @@ export const processAudio = async (req, res) => {
 
     
     
-    console.log(`📁 Processing uploaded file for candidate ${candidateId}: ${req.file.filename}`);
+    console.log(`Processing uploaded file for candidate ${candidateId}: ${req.file.filename}`);
     
     // Transcribe the audio
-    console.log('🎤 Transcribing audio...');
+    console.log('Transcribing audio...');
     const rawTranscript = await transcribe(req.file.path);
     
     // Format transcript as dialogue
-    console.log('💬 Formatting transcript to dialogue...');
+    console.log('Formatting transcript to dialogue...');
     const formattedDialogue = await formatTranscriptToDialogue(rawTranscript);
     
     // Extract candidate profile (using raw transcript for better data extraction)
-    console.log('🧠 Extracting candidate profile...');
+    console.log('Extracting candidate profile...');
     const profile = await extractProfile(rawTranscript);
     
     // Prepare metadata
@@ -60,7 +60,7 @@ export const processAudio = async (req, res) => {
     };
     
     // Save to storage first (filesystem or S3) including the audio file
-    console.log(`💾 Saving candidate data using ${config.storage.type} storage...`);
+    console.log(`Saving candidate data using ${config.storage.type} storage...`);
     const storageResult = await storageManager.saveCandidateData(
       candidateId,
       {
@@ -74,7 +74,7 @@ export const processAudio = async (req, res) => {
     );
     
     // Generate PDF and HTML files after storage is set up
-    console.log('📄 Generating PDF report...');
+    console.log('Generating PDF report...');
     let generatedFiles = null;
     
     try {
@@ -111,18 +111,18 @@ export const processAudio = async (req, res) => {
          }
       }
       
-      console.log('✅ PDF and HTML generated and saved successfully');
+      console.log('PDF and HTML generated and saved successfully');
     } catch (pdfError) {
-      console.warn('⚠️ PDF generation failed, continuing without PDF:', pdfError.message);
+      console.warn('PDF generation failed, continuing without PDF:', pdfError.message);
       // Continue without PDF if generation fails
     }
     
     // Audio file has been moved to session folder, clean up temporary file if it still exists
     if (fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
-      console.log('🗑️ Cleaned up temporary file');
+      console.log('Cleaned up temporary file');
     } else {
-      console.log('📁 Audio file moved to session folder');
+      console.log('Audio file moved to session folder');
     }
     
     // Return the candidate profile with storage information
@@ -142,7 +142,7 @@ export const processAudio = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Processing failed:', error);
+    console.error('Processing failed:', error);
     
     // Clean up file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
@@ -159,7 +159,7 @@ export const processAudio = async (req, res) => {
 // Get list of all candidates controller
 export const getCandidates = async (req, res) => {
   try {
-    console.log('📋 Retrieving all candidates...');
+    console.log('Retrieving all candidates...');
     
     const candidates = await storageManager.listCandidates();
     
@@ -171,7 +171,7 @@ export const getCandidates = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Failed to retrieve candidates:', error);
+    console.error('Failed to retrieve candidates:', error);
     
     res.status(500).json({
       error: 'Failed to retrieve candidates',
@@ -192,7 +192,7 @@ export const getCandidateSessions = async (req, res) => {
       });
     }
     
-    console.log(`📋 Retrieving sessions for candidate: ${candidateId}`);
+    console.log(`Retrieving sessions for candidate: ${candidateId}`);
     
     const sessions = await storageManager.listCandidateSessions(candidateId);
     
@@ -205,7 +205,7 @@ export const getCandidateSessions = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Failed to retrieve candidate sessions:', error);
+    console.error('Failed to retrieve candidate sessions:', error);
     
     res.status(500).json({
       error: 'Failed to retrieve sessions',
@@ -281,7 +281,7 @@ export const serveFile = async (req, res) => {
     fileStream.pipe(res);
     
     fileStream.on('error', (error) => {
-      console.error('❌ Error streaming file:', error);
+      console.error('Error streaming file:', error);
       if (!res.headersSent) {
         res.status(500).json({
           error: 'File streaming error',
@@ -291,7 +291,7 @@ export const serveFile = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Failed to serve file:', error);
+    console.error('Failed to serve file:', error);
     
     if (!res.headersSent) {
       res.status(500).json({

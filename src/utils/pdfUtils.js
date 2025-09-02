@@ -285,7 +285,7 @@ function generateHTML(candidateProfile, metadata) {
  */
 export async function generateCandidatePDF(candidateProfile, metadata, outputDir = null) {
   try {
-    console.log('📄 Generating HTML template...');
+    console.log('Generating HTML template...');
     
     // Generate HTML content
     const htmlContent = generateHTML(candidateProfile, metadata);
@@ -308,13 +308,13 @@ export async function generateCandidatePDF(candidateProfile, metadata, outputDir
       
       // Save HTML file
       await fs.promises.writeFile(htmlPath, htmlContent, 'utf8');
-      console.log('💾 HTML file saved to filesystem');
+      console.log('HTML file saved to filesystem');
     } else {
       // For S3 storage, we'll generate buffers
       htmlBuffer = Buffer.from(htmlContent, 'utf8');
     }
     
-    console.log('🖨️ Converting HTML to PDF...');
+    console.log('Converting HTML to PDF...');
     
     // Launch Puppeteer
     const browser = await puppeteer.launch({
@@ -347,14 +347,14 @@ export async function generateCandidatePDF(candidateProfile, metadata, outputDir
         ...pdfOptions,
         path: pdfPath
       });
-      console.log('💾 PDF file saved to filesystem');
+      console.log('PDF file saved to filesystem');
     } else {
       // Generate PDF buffer for S3
       pdfBuffer = await page.pdf(pdfOptions);
     }
     
     await browser.close();
-    console.log('✅ PDF generation completed');
+    console.log('PDF generation completed');
     
     return {
       html: {
@@ -372,7 +372,7 @@ export async function generateCandidatePDF(candidateProfile, metadata, outputDir
     };
     
   } catch (error) {
-    console.error('❌ PDF generation failed:', error);
+    console.error('PDF generation failed:', error);
     throw new Error(`PDF generation failed: ${error.message}`);
   }
 }

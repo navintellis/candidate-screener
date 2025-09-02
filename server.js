@@ -27,17 +27,17 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Candidate Screener API server running on ${HOST}:${PORT}`);
-  console.log(`🔧 Environment: ${config.environment}`);
-  console.log(`💾 Storage: ${config.storage.type}`);
-  console.log(`📋 Available endpoints:`);
+  console.log(`Candidate Screener API server running on ${HOST}:${PORT}`);
+  console.log(`Environment: ${config.environment}`);
+  console.log(`Storage: ${config.storage.type}`);
+  console.log(`Available endpoints:`);
   console.log(`   GET  / - Health check`);
   console.log(`   GET  /api/candidates - List all candidates`);
   console.log(`   POST /api/candidates/:candidateId/process-audio - Upload MP3 for specific candidate`);
   console.log(`   GET  /api/candidates/:candidateId/sessions - List candidate sessions with file links`);
   console.log(`   GET  /files/* - Serve candidate files (audio, transcript, profile, PDF, HTML)`);
   console.log(`   POST /api/process-audio - Legacy endpoint (backward compatibility)`);
-  console.log(`\n💡 Usage examples:`);
+  console.log(`\nUsage examples:`);
   console.log(`   curl http://${HOST}:${PORT}/v1/api/candidates`);
   console.log(`   curl -X POST -F "audio=@interview.mp3" http://${HOST}:${PORT}/v1/api/candidates/CAND123/process-audio`);
   console.log(`   curl http://${HOST}:${PORT}/v1/api/candidates/CAND123/sessions`);

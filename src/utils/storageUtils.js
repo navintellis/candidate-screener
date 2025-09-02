@@ -130,7 +130,7 @@ class StorageManager {
       await fs.promises.copyFile(audioFile.path, audioPath);
       result.paths.audio = audioPath;
       
-      console.log(`📁 Audio file saved: ${audioFilename}`);
+      console.log(`Audio file saved: ${audioFilename}`);
     }
     
     // Add PDF and HTML files if provided
@@ -213,7 +213,7 @@ class StorageManager {
       uploadPromises.push(this._uploadToS3(audioKey, audioBuffer, audioFile.mimetype || 'audio/mpeg'));
       result.s3Keys.audio = audioKey;
       
-      console.log(`📁 Audio file uploaded to S3: ${audioFilename}`);
+      console.log(`Audio file uploaded to S3: ${audioFilename}`);
     }
     
     // Add PDF and HTML uploads if provided
@@ -412,7 +412,7 @@ class StorageManager {
             const metadataContent = await fs.promises.readFile(filePaths.metadata, 'utf8');
             metadata = JSON.parse(metadataContent);
           } catch (error) {
-            console.warn(`⚠️ Could not read metadata for session ${sessionId}:`, error.message);
+            console.warn(`Could not read metadata for session ${sessionId}:`, error.message);
           }
         }
         
@@ -429,7 +429,7 @@ class StorageManager {
               summary: profile.summary
             };
           } catch (error) {
-            console.warn(`⚠️ Could not read profile for session ${sessionId}:`, error.message);
+            console.warn(`Could not read profile for session ${sessionId}:`, error.message);
           }
         }
         
@@ -512,7 +512,7 @@ class StorageManager {
       });
       
     } catch (error) {
-      console.error('❌ Failed to list S3 candidates:', error);
+      console.error('Failed to list S3 candidates:', error);
       return [];
     }
   }
@@ -550,7 +550,7 @@ class StorageManager {
       });
       
     } catch (error) {
-      console.error('❌ Failed to list S3 sessions:', error);
+      console.error('Failed to list S3 sessions:', error);
       return [];
     }
   }
@@ -624,7 +624,7 @@ class StorageManager {
           const metadataContent = await this._getS3Object(s3Keys.metadata);
           metadata = JSON.parse(metadataContent);
         } catch (error) {
-          console.warn(`⚠️ Could not read metadata for session ${sessionId}:`, error.message);
+          console.warn(`Could not read metadata for session ${sessionId}:`, error.message);
         }
       }
       
@@ -641,7 +641,7 @@ class StorageManager {
             summary: profile.summary
           };
         } catch (error) {
-          console.warn(`⚠️ Could not read profile for session ${sessionId}:`, error.message);
+          console.warn(`Could not read profile for session ${sessionId}:`, error.message);
         }
       }
       
@@ -659,7 +659,7 @@ class StorageManager {
       };
       
     } catch (error) {
-      console.error(`❌ Failed to get S3 session data for ${sessionId}:`, error);
+      console.error(`Failed to get S3 session data for ${sessionId}:`, error);
       return null;
     }
   }
