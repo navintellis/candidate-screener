@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  audio-manager:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: audio-manager
+    ports:
+      - "${DOCKER_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-localhost}
+      # Override any environment variables here if needed
+      - PORT=3000
+      - HOST=0.0.0.0  # Bind to all interfaces in container
+    volumes:
+      # Mount volumes for persistent data storage
+      - ./candidate-data:/app/candidate-data
+      - ./processed-data:/app/processed-data
+      - ./uploads:/app/uploads
+      - ./generated-audio:/app/generated-audio
+      - ./samples:/app/samples
+      # Mount environment files
+      - ./.env.localhost:/app/.env.localhost:ro
+      - ./.env.staging:/app/.env.staging:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "const http = require('http'); http.get('http://localhost:3000/', (res) => { process.exit(res.statusCode === 404 ? 0 : 1); }).on('error', () => process.exit(1));"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - audio-manager-network
+
+  # Development service with live reload
+  audio-manager-dev:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: build  # Use build stage for development
+    container_name: audio-manager-dev
+    ports:
+      - "${DOCKER_PORT:-3001}:3000"
+    environment:
+      - NODE_ENV=localhost
+      - PORT=3000
+      - HOST=0.0.0.0
+    volumes:
+      # Mount source code for live reload
+      - .:/app
+      - /app/node_modules  # Anonymous volume to preserve node_modules
+      - ./candidate-data:/app/candidate-data
+      - ./processed-data:/app/processed-data
+      - ./uploads:/app/uploads
+      - ./generated-audio:/app/generated-audio
+      - ./samples:/app/samples
+    command: npm run dev
+    restart: unless-stopped
+    networks:
+      - audio-manager-network
+    profiles:
+      - dev  # Only starts when dev profile is specified
+
+networks:
+  audio-manager-network:
+    driver: bridge
+
+volumes:
+  # Named volumes for better data management
+  candidate_data:
+    driver: local
+  processed_data:
+    driver: local 
