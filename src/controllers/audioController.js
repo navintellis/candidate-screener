@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { transcribe, extractProfile } from '../utils/audioUtils.js';
+import { transcribe, extractProfile, formatTranscriptToDialogue } from '../utils/audioUtils.js';
 import { storageManager } from '../utils/storageUtils.js';
 import { loadConfig } from '../utils/load-config.js';
 import { generateCandidatePDF } from '../utils/pdfUtils.js';
@@ -35,11 +35,15 @@ export const processAudio = async (req, res) => {
     
     // Transcribe the audio
     console.log('🎤 Transcribing audio...');
-    const transcript = await transcribe(req.file.path);
+    const rawTranscript = await transcribe(req.file.path);
     
-    // Extract candidate profile
+    // Format transcript as dialogue
+    console.log('💬 Formatting transcript to dialogue...');
+    const formattedDialogue = await formatTranscriptToDialogue(rawTranscript);
+    
+    // Extract candidate profile (using raw transcript for better data extraction)
     console.log('🧠 Extracting candidate profile...');
-    const profile = await extractProfile(transcript);
+    const profile = await extractProfile(rawTranscript);
     
     // Prepare metadata
     const metadata = {
@@ -47,7 +51,9 @@ export const processAudio = async (req, res) => {
       originalFilename: req.file.originalname,
       fileSize: req.file.size,
       processedAt: new Date().toISOString(),
-      transcriptLength: transcript.length,
+      rawTranscriptLength: rawTranscript.length,
+      formattedDialogueLength: formattedDialogue.length,
+      dialogueFormatted: true,
       storageType: config.storage.type,
       environment: config.environment,
       sessionId: null // Will be set by storage manager
@@ -57,7 +63,10 @@ export const processAudio = async (req, res) => {
     console.log(`💾 Saving candidate data using ${config.storage.type} storage...`);
     const storageResult = await storageManager.saveCandidateData(
       candidateId,
-      transcript,
+      {
+        raw: rawTranscript,
+        formatted: formattedDialogue
+      },
       profile,
       metadata,
       null, // generatedFiles (will be added later)
@@ -124,7 +133,9 @@ export const processAudio = async (req, res) => {
       metadata: {
         candidateId,
         original_filename: req.file.originalname,
-        transcript_length: transcript.length,
+        raw_transcript_length: rawTranscript.length,
+        formatted_dialogue_length: formattedDialogue.length,
+        dialogue_formatted: true,
         processed_at: metadata.processedAt,
         storage_type: config.storage.type
       }

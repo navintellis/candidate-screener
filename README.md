@@ -6,6 +6,7 @@ A Node.js application for processing audio files, generating transcripts, and cr
 
 - Audio file upload and processing
 - Speech-to-text transcription using OpenAI
+- **Automatic dialogue formatting** - Converts raw transcripts into structured interviewer/candidate dialogue
 - Candidate profile extraction and generation
 - PDF and HTML report generation
 - Support for both filesystem and S3 storage
@@ -120,8 +121,30 @@ curl -X POST -F "audio=@interview.mp3" http://localhost:3000/v1/api/candidates/C
 # List sessions for a candidate
 curl http://localhost:3000/v1/api/candidates/CAND123/sessions
 
-# Download transcript
+# Download formatted dialogue transcript
 curl http://localhost:3000/v1/files/candidate-data/CAND123/session-id/transcript.txt
+
+# Download raw transcript (unformatted)
+curl http://localhost:3000/v1/files/candidate-data/CAND123/session-id/raw_transcript.txt
+
+# Download formatted dialogue
+curl http://localhost:3000/v1/files/candidate-data/CAND123/session-id/formatted_dialogue.txt
+```
+
+### Dialogue Formatting
+
+The system automatically converts raw transcripts into structured dialogue format:
+
+**Input (Raw Transcript):**
+```
+Hello, thank you for joining us today. Could you please introduce yourself? Thank you for having me. My name is Sarah Johnson and I'm a software engineer...
+```
+
+**Output (Formatted Dialogue):**
+```
+INTERVIEWER: Hello, thank you for joining us today. Could you please introduce yourself?
+
+CANDIDATE: Thank you for having me. My name is Sarah Johnson and I'm a software engineer...
 ```
 
 ### Storage

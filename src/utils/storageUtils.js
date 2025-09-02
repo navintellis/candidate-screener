@@ -36,7 +36,7 @@ class StorageManager {
   /**
    * Save candidate data (transcript, profile, PDF, HTML, and audio file)
    * @param {string} candidateId - Unique candidate identifier
-   * @param {string} transcript - Transcript content
+   * @param {string|Object} transcript - Transcript content (string) or object with {raw, formatted}
    * @param {Object} profile - Candidate profile object
    * @param {Object} metadata - Processing metadata
    * @param {Object} generatedFiles - Generated PDF and HTML files (optional)
@@ -66,17 +66,37 @@ class StorageManager {
     // Create directory structure
     await fs.promises.mkdir(candidateFolder, { recursive: true });
     
+    // Handle transcript - can be string or object with raw/formatted
+    const isTranscriptObject = typeof transcript === 'object' && transcript !== null;
+    
     // Define file paths
     const transcriptPath = path.join(candidateFolder, 'transcript.txt');
+    const rawTranscriptPath = path.join(candidateFolder, 'raw_transcript.txt');
+    const formattedDialoguePath = path.join(candidateFolder, 'formatted_dialogue.txt');
     const profilePath = path.join(candidateFolder, 'candidate_profile.json');
     const metadataPath = path.join(candidateFolder, 'metadata.json');
     
     // Base files to save
     const savePromises = [
-      fs.promises.writeFile(transcriptPath, transcript),
       fs.promises.writeFile(profilePath, JSON.stringify(profile, null, 2)),
       fs.promises.writeFile(metadataPath, JSON.stringify(metadata, null, 2))
     ];
+    
+    // Save transcript(s)
+    if (isTranscriptObject) {
+      // Save both raw and formatted transcripts
+      if (transcript.raw) {
+        savePromises.push(fs.promises.writeFile(rawTranscriptPath, transcript.raw));
+      }
+      if (transcript.formatted) {
+        savePromises.push(fs.promises.writeFile(formattedDialoguePath, transcript.formatted));
+        // Also save formatted as main transcript for backward compatibility
+        savePromises.push(fs.promises.writeFile(transcriptPath, transcript.formatted));
+      }
+    } else {
+      // Legacy: single transcript
+      savePromises.push(fs.promises.writeFile(transcriptPath, transcript));
+    }
     
     const result = {
       storageType: 'filesystem',
@@ -89,6 +109,16 @@ class StorageManager {
         folder: candidateFolder
       }
     };
+    
+    // Add additional transcript paths if object format was used
+    if (isTranscriptObject) {
+      if (transcript.raw) {
+        result.paths.rawTranscript = rawTranscriptPath;
+      }
+      if (transcript.formatted) {
+        result.paths.formattedDialogue = formattedDialoguePath;
+      }
+    }
 
     // Save audio file if provided
     if (audioFile) {
@@ -126,14 +156,18 @@ class StorageManager {
   async _saveToS3(candidateId, sessionId, transcript, profile, metadata, generatedFiles, audioFile) {
     const baseKey = `${this.storageConfig.candidateDataPrefix}/${candidateId}/${sessionId}`;
     
+    // Handle transcript - can be string or object with raw/formatted
+    const isTranscriptObject = typeof transcript === 'object' && transcript !== null;
+    
     // Define S3 keys
     const transcriptKey = `${baseKey}/transcript.txt`;
+    const rawTranscriptKey = `${baseKey}/raw_transcript.txt`;
+    const formattedDialogueKey = `${baseKey}/formatted_dialogue.txt`;
     const profileKey = `${baseKey}/candidate_profile.json`;
     const metadataKey = `${baseKey}/metadata.json`;
     
     // Base upload promises
     const uploadPromises = [
-      this._uploadToS3(transcriptKey, transcript, 'text/plain'),
       this._uploadToS3(profileKey, JSON.stringify(profile, null, 2), 'application/json'),
       this._uploadToS3(metadataKey, JSON.stringify(metadata, null, 2), 'application/json')
     ];
@@ -143,12 +177,30 @@ class StorageManager {
       candidateId,
       sessionId,
       s3Keys: {
-        transcript: transcriptKey,
         profile: profileKey,
         metadata: metadataKey
       },
       bucket: this.storageConfig.bucketName
     };
+    
+    // Upload transcript(s)
+    if (isTranscriptObject) {
+      // Upload both raw and formatted transcripts
+      if (transcript.raw) {
+        uploadPromises.push(this._uploadToS3(rawTranscriptKey, transcript.raw, 'text/plain'));
+        result.s3Keys.rawTranscript = rawTranscriptKey;
+      }
+      if (transcript.formatted) {
+        uploadPromises.push(this._uploadToS3(formattedDialogueKey, transcript.formatted, 'text/plain'));
+        uploadPromises.push(this._uploadToS3(transcriptKey, transcript.formatted, 'text/plain')); // Backward compatibility
+        result.s3Keys.formattedDialogue = formattedDialogueKey;
+        result.s3Keys.transcript = transcriptKey;
+      }
+    } else {
+      // Legacy: single transcript
+      uploadPromises.push(this._uploadToS3(transcriptKey, transcript, 'text/plain'));
+      result.s3Keys.transcript = transcriptKey;
+    }
 
     // Upload audio file if provided
     if (audioFile) {
