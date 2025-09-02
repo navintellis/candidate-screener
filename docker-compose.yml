@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  audio-manager:
+  candidate-screener:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: audio-manager
+    container_name: candidate-screener
     ports:
       - "${DOCKER_PORT:-3000}:3000"
     environment:
@@ -31,15 +31,15 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - audio-manager-network
+      - candidate-screener-network
 
   # Development service with live reload
-  audio-manager-dev:
+  candidate-screener-dev:
     build: 
       context: .
       dockerfile: Dockerfile
       target: build  # Use build stage for development
-    container_name: audio-manager-dev
+    container_name: candidate-screener-dev
     ports:
       - "${DOCKER_PORT:-3001}:3000"
     environment:
@@ -58,12 +58,12 @@ services:
     command: npm run dev
     restart: unless-stopped
     networks:
-      - audio-manager-network
+      - candidate-screener-network
     profiles:
       - dev  # Only starts when dev profile is specified
 
 networks:
-  audio-manager-network:
+  candidate-screener-network:
     driver: bridge
 
 volumes:

@@ -1,4 +1,4 @@
-# Audio Manager Application
+# Candidate Screener Application
 
 A Node.js application for processing audio files, generating transcripts, and creating candidate profiles with PDF/HTML reports.
 
@@ -22,7 +22,7 @@ A Node.js application for processing audio files, generating transcripts, and cr
 
 1. **Clone and navigate to the project directory:**
    ```bash
-   cd audio-manager
+   cd candidate-screener
    ```
 
 2. **Set up environment files:**
@@ -54,7 +54,7 @@ For development with live code reloading:
 
 ```bash
 # Start development environment with live reload
-docker compose --profile dev up audio-manager-dev --build
+docker compose --profile dev up candidate-screener-dev --build
 ```
 
 ### 🔧 Manual Docker Build
@@ -63,11 +63,11 @@ If you prefer to build and run manually:
 
 ```bash
 # Build the Docker image
-docker build -t audio-manager .
+docker build -t candidate-screener .
 
 # Run the container (localhost environment)
 docker run -d \
-  --name audio-manager \
+  --name candidate-screener \
   -p 3000:3000 \
   -v $(pwd)/candidate-data:/app/candidate-data \
   -v $(pwd)/processed-data:/app/processed-data \
@@ -76,15 +76,15 @@ docker run -d \
   -v $(pwd)/samples:/app/samples \
   -v $(pwd)/.env.localhost:/app/.env.localhost:ro \
   -e NODE_ENV=localhost \
-  audio-manager
+  candidate-screener
 
 # Run the container (staging environment)
 docker run -d \
-  --name audio-manager-staging \
+  --name candidate-screener-staging \
   -p 3001:3000 \
   -v $(pwd)/.env.staging:/app/.env.staging:ro \
   -e NODE_ENV=staging \
-  audio-manager
+  candidate-screener
 ```
 
 ### ⚙️ Configuration
@@ -147,17 +147,17 @@ You can override configuration with environment variables:
 
 ```bash
 # Set OpenAI API key
-docker run -e OPENAI_API_KEY=your-api-key audio-manager
+docker run -e OPENAI_API_KEY=your-api-key candidate-screener
 
 # Use staging configuration with S3
 docker run -e NODE_ENV=staging \
   -e S3_BUCKET_NAME=your-bucket \
   -e S3_ACCESS_KEY_ID=your-key \
   -e S3_SECRET_ACCESS_KEY=your-secret \
-  audio-manager
+  candidate-screener
 
 # Use custom port
-docker run -e DOCKER_PORT=8080 -p 8080:3000 audio-manager
+docker run -e DOCKER_PORT=8080 -p 8080:3000 candidate-screener
 ```
 
 ### 🏥 Health Check
@@ -169,10 +169,10 @@ The container includes a built-in health check:
 docker ps
 
 # View detailed health information
-docker inspect audio-manager | grep -A 10 "Health"
+docker inspect candidate-screener | grep -A 10 "Health"
 
 # View health check logs
-docker logs audio-manager
+docker logs candidate-screener
 ```
 
 ### 📋 Container Management
@@ -185,13 +185,13 @@ docker compose up -d
 docker compose down
 
 # Restart specific service
-docker compose restart audio-manager
+docker compose restart candidate-screener
 
 # View logs
-docker compose logs -f audio-manager
+docker compose logs -f candidate-screener
 
 # Shell into container
-docker compose exec audio-manager sh
+docker compose exec candidate-screener sh
 
 # Remove all containers and volumes
 docker compose down -v
@@ -203,7 +203,7 @@ docker compose down -v
 
 ```bash
 # Use custom environment file
-docker run -v ./my-custom.env:/app/.env.localhost audio-manager
+docker run -v ./my-custom.env:/app/.env.localhost candidate-screener
 
 # Override with docker-compose
 NODE_ENV=staging DOCKER_PORT=8080 docker compose up
@@ -213,22 +213,22 @@ NODE_ENV=staging DOCKER_PORT=8080 docker compose up
 
 ```bash
 # Build optimized production image
-docker build --target production -t audio-manager:prod .
+docker build --target production -t candidate-screener:prod .
 
 # Run with production settings
 docker run -d \
-  --name audio-manager-prod \
+  --name candidate-screener-prod \
   -p 80:3000 \
   --restart unless-stopped \
-  -v audio-manager-data:/app/candidate-data \
-  audio-manager:prod
+  -v candidate-screener-data:/app/candidate-data \
+  candidate-screener:prod
 ```
 
 #### Multi-Architecture Build
 
 ```bash
 # Build for multiple architectures
-docker buildx build --platform linux/amd64,linux/arm64 -t audio-manager .
+docker buildx build --platform linux/amd64,linux/arm64 -t candidate-screener .
 ```
 
 ## System Requirements
@@ -259,5 +259,5 @@ docker buildx build --platform linux/amd64,linux/arm64 -t audio-manager .
 Run with debug logging:
 
 ```bash
-docker run -e DEBUG=* audio-manager
+docker run -e DEBUG=* candidate-screener
 ``` 

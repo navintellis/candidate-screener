@@ -4,7 +4,7 @@ set -e
 # Default environment
 NODE_ENV=${NODE_ENV:-localhost}
 
-echo "🐳 Starting Audio Manager in $NODE_ENV environment..."
+echo "🐳 Starting Candidate Screener in $NODE_ENV environment..."
 
 # Load environment-specific configuration
 ENV_FILE=".env.$NODE_ENV"

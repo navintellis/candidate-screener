@@ -293,5 +293,5 @@ export const serveFile = async (req, res) => {
 
 // Health check controller
 export const healthCheck = (req, res) => {
-  res.json({ status: 'OK', message: 'Audio Manager API is running' });
+  res.json({ status: 'OK', message: 'Candidate Screener API is running' });
 }; 

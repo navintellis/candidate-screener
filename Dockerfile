@@ -55,7 +55,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S audio-manager -u 1001
+    adduser -S candidate-screener -u 1001
 
 WORKDIR /app
 
@@ -63,18 +63,18 @@ WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 
 # Copy application code
-COPY --from=build --chown=audio-manager:nodejs /app .
+COPY --from=build --chown=candidate-screener:nodejs /app .
 
 # Create necessary directories
 RUN mkdir -p candidate-data processed-data uploads generated-audio samples && \
-    chown -R audio-manager:nodejs candidate-data processed-data uploads generated-audio samples
+    chown -R candidate-screener:nodejs candidate-data processed-data uploads generated-audio samples
 
 # Copy entrypoint script
 COPY docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
 
 # Switch to non-root user
-USER audio-manager
+USER candidate-screener
 
 # Expose port
 EXPOSE 3000

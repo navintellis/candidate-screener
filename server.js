@@ -27,7 +27,7 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Audio Manager API server running on ${HOST}:${PORT}`);
+  console.log(`🚀 Candidate Screener API server running on ${HOST}:${PORT}`);
   console.log(`🔧 Environment: ${config.environment}`);
   console.log(`💾 Storage: ${config.storage.type}`);
   console.log(`📋 Available endpoints:`);
